@@ -18,7 +18,7 @@ export default {
     }
   ],
   plugins: [
-    analyze(),
+    analyze({ limit: 10}),
     nodeResolve({
       preferBuiltins: true,
       exportConditions: ['node'],

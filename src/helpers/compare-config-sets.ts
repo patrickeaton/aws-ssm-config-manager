@@ -92,7 +92,7 @@ export const compareConfigSets = (
   const table = new Table({
     head: ['Key', 'Outcome', sourceName, destinationName],
     truncate: '…',
-    colAligns: ['right', 'middle', 'left', 'left'],
+    colAligns: ['right', 'left', 'left', 'left'],
     colors: false,
   });
 
