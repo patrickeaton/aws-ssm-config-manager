@@ -1,0 +1,39 @@
+{
+  "name": "aws-ssm-config-manager",
+  "version": "1.0.0",
+  "description": "A command line tool for managing .env files using AWS parameter store",
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
+  "author": "@patrickeaton",
+  "license": "MIT",
+  "private": false,
+  "bin": {
+    "ssm-config": "./dist/index.js"
+  },
+  "scripts": {
+    "run": "node dist/index.js",
+    "run-ts": "ts-node src/index.ts",
+    "build": "rollup -c --bundleConfigAsCjs"
+  },
+  "dependencies": {
+    "@aws-sdk/client-ssm": "^3.490.0",
+    "chalk": "^4.1.2",
+    "cli-table": "^0.3.11",
+    "envfile": "^7.1.0",
+    "typescript": "^5.3.3",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@types/cli-table": "^0.3.4",
+    "@types/node": "^20.11.5",
+    "@types/yargs": "^17.0.32",
+    "rollup": "^4.9.5",
+    "rollup-plugin-analyzer": "^4.0.0",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "ts-node": "^10.9.2"
+  }
+}
