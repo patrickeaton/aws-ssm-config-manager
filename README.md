@@ -1,4 +1,4 @@
-# AWS Env Config Manager
+# AWS SSM Config Manager
 
 ## Description
 A small tool for storing your .env files in AWS parameter store. Can be used by the team OR your CI/CD pipeline to pull the latest config files
@@ -86,7 +86,7 @@ All of the options above can also be configured in a standalone json (or js file
 
 When using both a config file and command line instructions, the command-line values will override the values from the config file.
 
-[Example config.json](./example.config.json)
+[Example config.json](https://github.com/patrickeaton/aws-ssm-config-manager/blob/master/example.config.json)
 ```
 {
  "env": ".dev.env",
@@ -95,7 +95,7 @@ When using both a config file and command line instructions, the command-line va
 }
 ```
 
-[Example config.js](./example.config.js)
+[Example config.js](https://github.com/patrickeaton/aws-ssm-config-manager/blob/master/example.config.js)
 ```
 const env = process.env.NODE_ENV || 'local';
 
