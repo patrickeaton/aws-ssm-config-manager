@@ -10,10 +10,10 @@ This tool uses the configuration from the [AWS CLI](https://aws.amazon.com/cli/)
 
 ```
 Yarn:
-yarn add patrickeaton/aws-ssm-config-manager
+yarn add aws-ssm-config-manager
 
 NPM: 
-npm install patrickeaton/aws-ssm-config-manager
+npm install aws-ssm-config-manager
 ```
 
 ## Usage
