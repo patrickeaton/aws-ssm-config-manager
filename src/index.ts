@@ -9,7 +9,9 @@ import {
 } from './handlers';
 import { Parameters } from './models';
 import {
+  DEFAULT_EMPTY_KEY_STRING,
   DEFAULT_PARAMETERS,
+  EMPTY_KEY_ACTION,
   MISSING_AWS_ACTION,
   MISSING_LOCAL_ACTION,
 } from './constants';
@@ -71,14 +73,27 @@ yargs(hideBin(process.argv))
     choices: [MISSING_LOCAL_ACTION.keep, MISSING_LOCAL_ACTION.remove],
     default: DEFAULT_PARAMETERS.missingLocalAction,
     description:
-      'When a key exists locally, but is missing in AWS. When pulling, should the key be kept or removed locally. ',
+      'When a key exists locally, but is missing in AWS. When pulling, should the key be kept or removed locally.',
+  })
+  .option('emptyKeyAction', {
+    type: 'string',
+    choices: [EMPTY_KEY_ACTION.skip, EMPTY_KEY_ACTION.replace],
+    default: DEFAULT_PARAMETERS.emptyKeyAction,
+    description:
+      'AWS SSM does not support empty strings. This will determine what to do with empty keys. They can either be skipped or replaced with a placeholder value.',
+  })
+  .option('emptyKeyPlaceholder', {
+    type: 'string',
+    default: DEFAULT_EMPTY_KEY_STRING,
+    description:
+      'AWS SSM does not support empty strings. When the emptyKeyAction is replace, this will be the value used to replace the empty string.',
   })
   .option('config', {
     alias: 'c',
     type: 'string',
     default: DEFAULT_PARAMETERS.config,
     description:
-      'A path to the config file. This can manage all of the rest of these options for managing multiple environments.',
+      'A path to the config file. This can manage all of the rest of these options for managing multiple environments. If not provided, it will default to check aws-ssm.config.(json|js|ts) in the current directory.',
   })
   .option('verbose', {
     alias: 'v',

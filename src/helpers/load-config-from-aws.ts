@@ -3,7 +3,8 @@ import { ConfigSet } from '../models';
 
 export const loadConfigFromAws = async (
   region: string,
-  prefix: string
+  prefix: string,
+  emptyKeyPlaceholder: string
 ): Promise<ConfigSet> => {
   const ssm = new SSM({ region });
 
@@ -26,6 +27,11 @@ export const loadConfigFromAws = async (
 
   for (const { Name, Value, Type } of results) {
     const key = Name.substring(prefix.length); // Remove the prefix from the key
+    // If the value is the empty key placeholder, set it to an empty string
+    if (emptyKeyPlaceholder && Value === emptyKeyPlaceholder) {
+      envMap[key] = '';
+      continue;
+    }
     envMap[key] = Type === 'String' ? Value : Value.split(',');
   }
 

@@ -16,15 +16,16 @@ import { Parameters } from '../models';
 
 // Without updating compare the records in the parameter store with the records in the config file
 export const compareConfigHandler = async (cliParams: Parameters) => {
-  const { env, region, prefix, verbose, keys } = await generateParams(
+  const { env, region, prefix, verbose, keys, emptyKeyPlaceholder, emptyKeyAction } = await generateParams(
     cliParams
   );
   const existingConfig = await loadConfigFromFile(env);
-  const awsConfig = await loadConfigFromAws(region, prefix);
+  const awsConfig = await loadConfigFromAws(region, prefix, emptyKeyPlaceholder);
 
   const compareResults = compareConfigSets(awsConfig, existingConfig, {
     verbose,
     keys,
+    emptyKeyAction,
     sourceName: 'aws',
     destinationName: env,
     loggers: {

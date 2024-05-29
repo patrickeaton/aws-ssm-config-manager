@@ -1,10 +1,11 @@
 import chalk from 'chalk';
-import { ConfigSet } from '../models';
+import { ConfigSet, EmptyKeyAction } from '../models';
 import Table from 'cli-table';
 
 type CompareOptions = {
-  verbose?: number;
-  keys?: string[];
+  emptyKeyAction: EmptyKeyAction;
+  verbose: number;
+  keys: string[];
   sourceName?: string;
   destinationName?: string;
   loggers?: {
@@ -37,11 +38,11 @@ const compareRecord = (
   // if this record is skipped, return skipped
   if (skip) return COMPARE_OUTCOMES.SKIPPED;
 
-  // If it's in the source but not the destination, it's missing
-  if (!source) return COMPARE_OUTCOMES.MISSING;
+  // If it's in the destination but not the source, it's missing.
+  if (source === undefined) return COMPARE_OUTCOMES.MISSING;
 
-  // If it's in the destination but not the source, it's added
-  if (!destination) return COMPARE_OUTCOMES.ADDED;
+  // If it's in the source but not the destination, it's added.
+  if (destination === undefined) return COMPARE_OUTCOMES.ADDED;
 
   // If it's in both, compare to determind if it's the same or updated
   return JSON.stringify(source) === JSON.stringify(destination)
@@ -49,20 +50,39 @@ const compareRecord = (
     : COMPARE_OUTCOMES.UPDATED;
 };
 
-const shouldSkipRecord = (key: string, keys: string[]) => {
+/**
+ * @param key The key to check
+ * @param keys The keys provided by the user, skip all others
+ * @returns Whether to skip
+ */
+const isKeyInList = (key: string, keys: string[]) => {
   if (!keys.length) return false;
 
   return !keys.includes(key);
+};
+
+/**
+ * @param sourceValue The value of the source
+ * @param emptyKeyAction The action to take for empty keys.
+ */
+const skipEmptyKey = (
+  sourceValue: string | string[],
+  emptyKeyAction: EmptyKeyAction
+) => {
+  if (sourceValue?.length) return false;
+
+  return emptyKeyAction === 'skip';
 };
 
 export const compareConfigSets = (
   source: ConfigSet,
   destination: ConfigSet,
   {
-    verbose = 0,
+    emptyKeyAction,
+    verbose,
+    keys,
     sourceName = 'source',
     destinationName = 'destination',
-    keys = [],
     loggers = {
       [COMPARE_OUTCOMES.SAME]: chalk.blue,
       [COMPARE_OUTCOMES.UPDATED]: chalk.yellow,
@@ -70,7 +90,7 @@ export const compareConfigSets = (
       [COMPARE_OUTCOMES.ADDED]: chalk.green,
       [COMPARE_OUTCOMES.SKIPPED]: chalk.gray,
     },
-  }: CompareOptions = {}
+  }: CompareOptions
 ) => {
   const sourceKeys = Object.keys(source);
   const destinationKeys = Object.keys(destination);
@@ -102,7 +122,8 @@ export const compareConfigSets = (
     const outcome = compareRecord(
       sourceValue,
       destinationValue,
-      shouldSkipRecord(key, keys)
+      // Does this key need to be skipped?
+      !isKeyInList(key, keys) && skipEmptyKey(sourceValue, emptyKeyAction)
     );
 
     outcomes[outcome as CompareOutcome].push(key);
@@ -115,6 +136,7 @@ export const compareConfigSets = (
     if (outcome === COMPARE_OUTCOMES.SKIPPED && verbose < 3) continue;
 
     const convertToLoggable = (value: string | string[]) => {
+      if(value === undefined) return '-';
       if (!value) return '';
 
       const valueToUse = Array.isArray(value) ? value.join(',') : value;

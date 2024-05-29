@@ -12,17 +12,39 @@ import {
 import { Parameters } from '../models';
 import { MISSING_AWS_ACTION } from '../constants';
 
+// Convert the value to a string or string array. If the value is empty, return the empty key placeholder
+const getValue = (value: string | string[], emptyKeyPlaceholder: string) => {
+  if(!value?.length) return emptyKeyPlaceholder;
+  
+  return Array.isArray(value)
+            ? (value as String[]).join(',')
+            : (value as string)
+};
+
 export const pushConfigHandler = async (cliParams: Parameters) => {
-  const { env, region, prefix, verbose, missingAwsAction, keys } =
-    await generateParams(cliParams);
+  const {
+    env,
+    region,
+    prefix,
+    verbose,
+    missingAwsAction,
+    keys,
+    emptyKeyAction,
+    emptyKeyPlaceholder,
+  } = await generateParams(cliParams);
   const localConfig = await loadConfigFromFile(env);
-  const awsConfig = await loadConfigFromAws(region, prefix);
+  const awsConfig = await loadConfigFromAws(
+    region,
+    prefix,
+    emptyKeyPlaceholder,
+  );
 
   const ssm = new SSM({ region });
 
   const compareResults = compareConfigSets(localConfig, awsConfig, {
     verbose,
     keys,
+    emptyKeyAction,
   });
 
   if (compareResults.skipped.length)
@@ -56,9 +78,7 @@ export const pushConfigHandler = async (cliParams: Parameters) => {
       case COMPARE_OUTCOMES.UPDATED:
         await ssm.putParameter({
           Name: `${prefix}${key}`,
-          Value: Array.isArray(localConfig[key])
-            ? (localConfig[key] as String[]).join(',')
-            : (localConfig[key] as string),
+          Value: getValue(localConfig[key], emptyKeyPlaceholder), 
           Type: Array.isArray(localConfig[key]) ? 'StringList' : 'String',
           Overwrite: true,
         });

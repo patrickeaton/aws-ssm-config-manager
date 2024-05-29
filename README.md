@@ -69,8 +69,14 @@ When a key already exists in AWS but not in the local .env file. When pushing, s
 `--missingLocalAction  [string] [choices: "keep", "remove"] [default: "keep"]`
 When a key exists locally, but is missing in AWS. When pulling, should the key be kept or removed locally.
 
+` --emptyKeyAction [string] [choices: "skip", "replace"] [default: "skip"]`
+AWS SSM does not support empty strings. This will determine what to do with empty keys. They can either be skipped or replaced with a placeholder value.
+
+`--emptyKeyPlaceholder [string] [default: "[EMPTY]"]`
+AWS SSM does not support empty strings. When the emptyKeyAction is replace, this will be the value used to replace the empty string.
+
 `--config, -c [default none]`
-A path to a pre-configured config file to use instead of command-line flags. See below.
+A path to a pre-configured config file to use instead of command-line flags. If a path is not provided it will default to checking aws-ssm.config.(json|js|ts) in the current directory. See below. 
 
 `--verbose, -v[vv] [count] [default 0]`
 The level of logging that the script should output, publishing different values at different levels

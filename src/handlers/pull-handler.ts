@@ -17,12 +17,25 @@ import {
 import { MISSING_LOCAL_ACTION } from '../constants';
 
 export const pullConfigHandler = async (cliParams: Parameters) => {
-  const { env, region, prefix, verbose, missingLocalAction, keys } =
-    await generateParams(cliParams);
+  const {
+    env,
+    region,
+    prefix,
+    verbose,
+    missingLocalAction,
+    keys,
+    emptyKeyAction,
+    emptyKeyPlaceholder,
+  } = await generateParams(cliParams);
   const existingConfig = await loadConfigFromFile(env);
-  const awsConfig = await loadConfigFromAws(region, prefix);
+  const awsConfig = await loadConfigFromAws(
+    region,
+    prefix,
+    emptyKeyPlaceholder
+  );
 
   const compareResults = compareConfigSets(awsConfig, existingConfig, {
+    emptyKeyAction,
     verbose,
     keys,
   });
@@ -69,7 +82,7 @@ export const pullConfigHandler = async (cliParams: Parameters) => {
     },
     {}
   );
-  
+
   info(`Saving ${Object.keys(configToSave).length} key(s) to ${env}`);
   await promises.writeFile(`${process.cwd()}/${env}`, stringify(configToSave));
 };
