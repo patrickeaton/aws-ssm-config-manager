@@ -2,26 +2,26 @@ import { SSM } from '@aws-sdk/client-ssm';
 import {
   COMPARE_OUTCOMES,
   compareConfigSets,
-  generateParams,
-  info,
   loadConfigFromAws,
   loadConfigFromFile,
-  success,
-  warn,
 } from '../helpers';
 import { Parameters } from '../models';
 import { MISSING_AWS_ACTION } from '../constants';
+import { EasyCLITheme } from 'easy-cli-framework';
 
 // Convert the value to a string or string array. If the value is empty, return the empty key placeholder
 const getValue = (value: string | string[], emptyKeyPlaceholder: string) => {
-  if(!value?.length) return emptyKeyPlaceholder;
-  
+  if (!value?.length) return emptyKeyPlaceholder;
+
   return Array.isArray(value)
-            ? (value as String[]).join(',')
-            : (value as string)
+    ? (value as String[]).join(',')
+    : (value as string);
 };
 
-export const pushConfigHandler = async (cliParams: Parameters) => {
+export const pushConfigHandler = async (
+  cliParams: Parameters,
+  theme: EasyCLITheme
+) => {
   const {
     env,
     region,
@@ -31,44 +31,55 @@ export const pushConfigHandler = async (cliParams: Parameters) => {
     keys,
     emptyKeyAction,
     emptyKeyPlaceholder,
-  } = await generateParams(cliParams);
+  } = cliParams;
+  const logger = theme.getLogger();
   const localConfig = await loadConfigFromFile(env);
   const awsConfig = await loadConfigFromAws(
     region,
     prefix,
-    emptyKeyPlaceholder,
+    emptyKeyPlaceholder
   );
 
   const ssm = new SSM({ region });
 
-  const compareResults = compareConfigSets(localConfig, awsConfig, {
+  const compareResults = compareConfigSets(localConfig, awsConfig, theme, {
     verbose,
     keys,
     emptyKeyAction,
   });
 
   if (compareResults.skipped.length)
-    info(`Found ${compareResults.skipped.length} key(s) to skip.`);
+    logger
+      .info(`Found ${compareResults.skipped.length} key(s) to skip.`)
+      .force();
 
   if (compareResults.added.length)
-    success(`Found ${compareResults.added.length} new key(s) from ${env}.`);
+    logger.success(
+      `Found ${compareResults.added.length} new key(s) from ${env}.`
+    ).force;
 
   if (compareResults.updated.length)
-    success(
-      `Found ${compareResults.updated.length} updated key(s) from ${env}.`
-    );
+    logger
+      .success(
+        `Found ${compareResults.updated.length} updated key(s) from ${env}.`
+      )
+      .force();
 
   if (compareResults.same.length)
-    info(`Found ${compareResults.same.length} key(s) with matching values.`);
+    logger
+      .info(`Found ${compareResults.same.length} key(s) with matching values.`)
+      .force();
 
   if (compareResults.missing.length)
-    warn(
-      `Found ${
-        compareResults.missing.length
-      } key(s) missing from ${env} that exist in aws. These key(s) will be ${
-        missingAwsAction === MISSING_AWS_ACTION.keep ? 'kept' : 'removed'
-      }.`
-    );
+    logger
+      .warn(
+        `Found ${
+          compareResults.missing.length
+        } key(s) missing from ${env} that exist in aws. These key(s) will be ${
+          missingAwsAction === MISSING_AWS_ACTION.keep ? 'kept' : 'removed'
+        }.`
+      )
+      .force();
 
   // Go through the compare results and build a config set to save
   for (const { key, action } of compareResults.actions) {
@@ -78,7 +89,7 @@ export const pushConfigHandler = async (cliParams: Parameters) => {
       case COMPARE_OUTCOMES.UPDATED:
         await ssm.putParameter({
           Name: `${prefix}${key}`,
-          Value: getValue(localConfig[key], emptyKeyPlaceholder), 
+          Value: getValue(localConfig[key], emptyKeyPlaceholder),
           Type: Array.isArray(localConfig[key]) ? 'StringList' : 'String',
           Overwrite: true,
         });

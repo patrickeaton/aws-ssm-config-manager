@@ -1,13 +1,8 @@
-import { SSM } from '@aws-sdk/client-ssm';
 import { stringify } from 'envfile';
 import { promises } from 'fs';
 import {
-  generateParams,
-  info,
   loadConfigFromAws,
   loadConfigFromFile,
-  success,
-  warn,
 } from '../helpers';
 import { ConfigSet, Parameters } from '../models';
 import {
@@ -15,8 +10,12 @@ import {
   compareConfigSets,
 } from '../helpers/compare-config-sets';
 import { MISSING_LOCAL_ACTION } from '../constants';
+import { EasyCLITheme } from 'easy-cli-framework';
 
-export const pullConfigHandler = async (cliParams: Parameters) => {
+export const pullConfigHandler = async (
+  cliParams: Parameters,
+  theme: EasyCLITheme
+) => {
   const {
     env,
     region,
@@ -26,7 +25,7 @@ export const pullConfigHandler = async (cliParams: Parameters) => {
     keys,
     emptyKeyAction,
     emptyKeyPlaceholder,
-  } = await generateParams(cliParams);
+  } = await cliParams;
   const existingConfig = await loadConfigFromFile(env);
   const awsConfig = await loadConfigFromAws(
     region,
@@ -34,32 +33,46 @@ export const pullConfigHandler = async (cliParams: Parameters) => {
     emptyKeyPlaceholder
   );
 
-  const compareResults = compareConfigSets(awsConfig, existingConfig, {
+  const logger = theme.getLogger();
+
+  const compareResults = compareConfigSets(awsConfig, existingConfig, theme, {
     emptyKeyAction,
     verbose,
     keys,
   });
 
   if (compareResults.skipped.length)
-    info(`Found ${compareResults.skipped.length} key(s) to skip.`);
+    logger
+      .info(`Found ${compareResults.skipped.length} key(s) to skip.`)
+      .force();
 
   if (compareResults.added.length)
-    success(`Found ${compareResults.added.length} new key(s) from aws.`);
+    logger
+      .success(`Found ${compareResults.added.length} new key(s) from aws.`)
+      .force();
 
   if (compareResults.updated.length)
-    success(`Found ${compareResults.updated.length} updated key(s) from aws.`);
+    logger
+      .success(
+        `Found ${compareResults.updated.length} updated key(s) from aws.`
+      )
+      .force();
 
   if (compareResults.same.length)
-    info(`Found ${compareResults.same.length} key(s) with matching values.`);
+    logger
+      .info(`Found ${compareResults.same.length} key(s) with matching values.`)
+      .force();
 
   if (compareResults.missing.length)
-    warn(
-      `Found ${
-        compareResults.missing.length
-      } key(s) missing from aws that exist in ${env}. These key(s) will be ${
-        missingLocalAction === MISSING_LOCAL_ACTION.keep ? 'kept' : 'removed'
-      }.`
-    );
+    logger
+      .warn(
+        `Found ${
+          compareResults.missing.length
+        } key(s) missing from aws that exist in ${env}. These key(s) will be ${
+          missingLocalAction === MISSING_LOCAL_ACTION.keep ? 'kept' : 'removed'
+        }.`
+      )
+      .force();
 
   // Go through the compare results and build a config set to save
   const configToSave: ConfigSet = compareResults.actions.reduce(
@@ -83,6 +96,8 @@ export const pullConfigHandler = async (cliParams: Parameters) => {
     {}
   );
 
-  info(`Saving ${Object.keys(configToSave).length} key(s) to ${env}`);
+  logger
+    .info(`Saving ${Object.keys(configToSave).length} key(s) to ${env}`)
+    .force();
   await promises.writeFile(`${process.cwd()}/${env}`, stringify(configToSave));
 };

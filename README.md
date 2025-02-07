@@ -34,12 +34,15 @@ Pull config from AWS SSM Parameter Store and save to a local .env file.
 
 ### Compare
 
-Compare values between a local .env file and AWS SSM Parameter Store.
+Compare values between a local .env file and AWS SSM Parameter Store. (Default Command)
 
 `ssm-config compare`
 
+### Configure
 
+Manage your configuration file
 
+`ssm-config configure`
 
 ### Using AWS Profiles
 
@@ -92,7 +95,7 @@ All of the options above can also be configured in a standalone json (or js file
 
 When using both a config file and command line instructions, the command-line values will override the values from the config file.
 
-[Example config.json](https://github.com/patrickeaton/aws-ssm-config-manager/blob/master/example.config.json)
+[Example config.json](https://github.com/patrickeaton/aws-ssm-config-manager/blob/master/aws-ssm.config.json)
 ```
 {
  "env": ".dev.env",
@@ -101,7 +104,7 @@ When using both a config file and command line instructions, the command-line va
 }
 ```
 
-[Example config.js](https://github.com/patrickeaton/aws-ssm-config-manager/blob/master/example.config.js)
+[Example config.js](https://github.com/patrickeaton/aws-ssm-config-manager/blob/master/aws-ssm.config.js)
 ```
 const env = process.env.NODE_ENV || 'local';
 

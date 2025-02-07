@@ -1,6 +1,5 @@
-import chalk from 'chalk';
 import { ConfigSet, EmptyKeyAction } from '../models';
-import Table from 'cli-table';
+import { EasyCLITheme, DisplayOptions } from 'easy-cli-framework';
 
 type CompareOptions = {
   emptyKeyAction: EmptyKeyAction;
@@ -9,8 +8,15 @@ type CompareOptions = {
   sourceName?: string;
   destinationName?: string;
   loggers?: {
-    [key: CompareOutcome]: (key: string) => string;
+    [key: CompareOutcome]: DisplayOptions;
   };
+};
+
+type CompareTableData = {
+  key: string;
+  outcome: string;
+  source: string;
+  destination: string;
 };
 
 export const COMPARE_OUTCOMES = {
@@ -77,6 +83,7 @@ const skipEmptyKey = (
 export const compareConfigSets = (
   source: ConfigSet,
   destination: ConfigSet,
+  theme: EasyCLITheme,
   {
     emptyKeyAction,
     verbose,
@@ -84,11 +91,11 @@ export const compareConfigSets = (
     sourceName = 'source',
     destinationName = 'destination',
     loggers = {
-      [COMPARE_OUTCOMES.SAME]: chalk.blue,
-      [COMPARE_OUTCOMES.UPDATED]: chalk.yellow,
-      [COMPARE_OUTCOMES.MISSING]: chalk.red,
-      [COMPARE_OUTCOMES.ADDED]: chalk.green,
-      [COMPARE_OUTCOMES.SKIPPED]: chalk.gray,
+      [COMPARE_OUTCOMES.SAME]: 'info',
+      [COMPARE_OUTCOMES.UPDATED]: 'warn',
+      [COMPARE_OUTCOMES.MISSING]: 'error',
+      [COMPARE_OUTCOMES.ADDED]: 'error',
+      [COMPARE_OUTCOMES.SKIPPED]: 'info',
     },
   }: CompareOptions
 ) => {
@@ -109,14 +116,40 @@ export const compareConfigSets = (
     actions: [],
   };
 
-  const table = new Table({
-    head: ['Key', 'Outcome', sourceName, destinationName],
-    truncate: '…',
-    colAligns: ['right', 'left', 'left', 'left'],
-    colors: false,
-  });
+  const table = theme.getTable<CompareTableData>([
+    {
+      name: 'Key',
+      data: item => item.key,
+      style: item => [outcomes[item.outcome], { bold: true }] as DisplayOptions,
+    },
+    {
+      name: 'Outcome',
+      data: item => item.outcome,
+      style: item => outcomes[item.outcome],
+    },
+    {
+      name: sourceName,
+      data: item => item.source,
+      style: item => outcomes[item.outcome],
+    },
+    {
+      name: destinationName,
+      data: item => item.destination,
+      style: item => outcomes[item.outcome],
+    },
+  ]);
 
-  for (const key of allKeys) {
+  /** Make the value Loggable */
+  const convertToLoggable = (value: string | string[]) => {
+    if (value === undefined) return '-';
+    if (!value) return '';
+
+    const valueToUse = Array.isArray(value) ? value.join(',') : value;
+
+    return valueToUse.length > 32 ? valueToUse.slice(0, 32) + '…' : valueToUse;
+  };
+
+  const data = allKeys.reduce((acc: CompareTableData[], key: string) => {
     const sourceValue = source[key];
     const destinationValue = destination[key];
     const outcome = compareRecord(
@@ -129,36 +162,28 @@ export const compareConfigSets = (
     outcomes[outcome as CompareOutcome].push(key);
     outcomes.actions.push({ key, action: outcome as CompareOutcome });
 
-    if (!verbose) continue;
+    if (!verbose) return acc;
 
     // If verbose is only set to 1, only log the differing records
-    if (outcome === COMPARE_OUTCOMES.SAME && verbose < 2) continue;
-    if (outcome === COMPARE_OUTCOMES.SKIPPED && verbose < 3) continue;
-
-    const convertToLoggable = (value: string | string[]) => {
-      if(value === undefined) return '-';
-      if (!value) return '';
-
-      const valueToUse = Array.isArray(value) ? value.join(',') : value;
-
-      return valueToUse.length > 32
-        ? valueToUse.slice(0, 32) + '…'
-        : valueToUse;
-    };
+    if (outcome === COMPARE_OUTCOMES.SAME && verbose < 2) return acc;
+    if (outcome === COMPARE_OUTCOMES.SKIPPED && verbose < 3) return acc;
 
     const sourceValueString = convertToLoggable(sourceValue);
     const destinationValueString = convertToLoggable(destinationValue);
 
-    table.push([
-      loggers[outcome](key),
-      loggers[outcome](outcome),
-      loggers[outcome](sourceValueString),
-      loggers[outcome](destinationValueString),
-    ]);
-  }
+    return [
+      ...acc,
+      {
+        key,
+        outcome,
+        source: sourceValueString,
+        destination: destinationValueString,
+      },
+    ];
+  }, [] as CompareTableData[]);
 
   // Output the table if verbose is true
-  if (verbose) console.log(`\n\n${table.toString()}\n\n`);
+  if (verbose) table.render(data);
 
   return outcomes;
 };

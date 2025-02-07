@@ -13,16 +13,13 @@
   },
   "scripts": {
     "run": "node dist/index.js",
-    "run-ts": "ts-node src/index.ts",
+    "run-ts": "ts-node-script src/index.ts",
     "build": "rollup -c --bundleConfigAsCjs"
   },
   "dependencies": {
     "@aws-sdk/client-ssm": "^3.490.0",
-    "chalk": "^4.1.2",
-    "cli-table": "^0.3.11",
     "envfile": "^7.1.0",
-    "typescript": "^5.3.3",
-    "yargs": "^17.7.2"
+    "typescript": "^5.3.3"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",
@@ -35,5 +32,16 @@
     "rollup-plugin-analyzer": "^4.0.0",
     "rollup-plugin-typescript2": "^0.36.0",
     "ts-node": "^10.9.2"
-  }
+  },
+  "keywords": [
+    "aws",
+    "ssm",
+    "parameter store",
+    "env",
+    "dotenv",
+    "config",
+    "configuration",
+    "config manager",
+    "cli"
+  ]
 }

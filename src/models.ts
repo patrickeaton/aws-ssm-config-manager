@@ -15,15 +15,15 @@ export type EmptyKeyAction =
 
 export type Parameters = {
   config?: string;
-  env?: string;
-  prefix?: string;
-  keys?: string[];
-  verbose?: number;
-  region?: string;
-  missingAwsAction?: MissingAwsAction;
-  missingLocalAction?: MissingLocalAction;
-  emptyKeyAction?: EmptyKeyAction;
-  emptyKeyPlaceholder?: string;
+  env: string;
+  prefix: string;
+  keys: string[];
+  verbose: number;
+  region: string;
+  missingAwsAction: MissingAwsAction;
+  missingLocalAction: MissingLocalAction;
+  emptyKeyAction: EmptyKeyAction;
+  emptyKeyPlaceholder: string;
 };
 
 export type ConfigSet = {

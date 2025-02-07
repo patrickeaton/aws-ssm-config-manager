@@ -1,5 +1,0 @@
-{
- "env": ".dev.env",
- "region": "us-east-1",
- "prefix": "/dev/config/"
-}
