@@ -1,3 +1,4 @@
+// @ts-ignore
 import { stringify } from 'envfile';
 import { promises } from 'fs';
 import {

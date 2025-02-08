@@ -3,7 +3,7 @@
     "outDir": "./dist",
     "module": "ESNext",
     "target": "es2019",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
 
     "sourceMap": true,
     "declaration": true,
@@ -13,6 +13,7 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
+    "noEmit": true,
     "typeRoots": [
       "./node_modules/@types",
       "../../node_modules/@types"

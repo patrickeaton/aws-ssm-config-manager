@@ -2,22 +2,21 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import typescript from 'rollup-plugin-typescript2';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
-import analyze from 'rollup-plugin-analyzer';
+import { cleandir } from "rollup-plugin-cleandir";
+import { uglify } from "rollup-plugin-uglify";
 
 export default {
   input: 'src/index.ts',
   output: [
     {
-      file: 'dist/index.es.js',
-      format: 'es',
-    },
-    {
       file: 'dist/index.js',
       format: 'commonjs',
+      inlineDynamicImports: true,
+      minifyInternalExports: true
     },
   ],
   plugins: [
-    analyze({ limit: 10 }),
+    cleandir('dist/'),
     nodeResolve({
       preferBuiltins: true,
       exportConditions: ['node'],
@@ -26,7 +25,10 @@ export default {
       clean: true,
       tsconfig: './tsconfig.build.json',
     }),
-    commonjs(),
+    commonjs({
+      ignoreDynamicRequires: true,
+    }),
+    uglify(),
     json(),
   ],
 };

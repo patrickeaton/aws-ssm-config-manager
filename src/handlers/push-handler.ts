@@ -7,7 +7,7 @@ import {
 } from '../helpers';
 import { Parameters } from '../models';
 import { MISSING_AWS_ACTION } from '../constants';
-import { EasyCLITheme } from 'easy-cli-framework';
+import { EasyCLITheme } from 'easy-cli-framework/themes';
 
 // Convert the value to a string or string array. If the value is empty, return the empty key placeholder
 const getValue = (value: string | string[], emptyKeyPlaceholder: string) => {

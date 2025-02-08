@@ -1,5 +1,5 @@
 import { ConfigSet, EmptyKeyAction } from '../models';
-import { EasyCLITheme, DisplayOptions } from 'easy-cli-framework';
+import { EasyCLITheme, DisplayOptions } from 'easy-cli-framework/themes';
 
 type CompareOptions = {
   emptyKeyAction: EmptyKeyAction;
@@ -94,7 +94,7 @@ export const compareConfigSets = (
       [COMPARE_OUTCOMES.SAME]: 'info',
       [COMPARE_OUTCOMES.UPDATED]: 'warn',
       [COMPARE_OUTCOMES.MISSING]: 'error',
-      [COMPARE_OUTCOMES.ADDED]: 'error',
+      [COMPARE_OUTCOMES.ADDED]: 'success',
       [COMPARE_OUTCOMES.SKIPPED]: 'info',
     },
   }: CompareOptions
@@ -116,26 +116,32 @@ export const compareConfigSets = (
     actions: [],
   };
 
+  const keyWidth = Math.max(...allKeys.map(key => key.length));
+
+  const dataWidth = Math.floor((110 - keyWidth) / 2);
+
   const table = theme.getTable<CompareTableData>([
     {
       name: 'Key',
       data: item => item.key,
-      style: item => [outcomes[item.outcome], { bold: true }] as DisplayOptions,
+      width: keyWidth,
+      align: 'right',
     },
     {
       name: 'Outcome',
       data: item => item.outcome,
-      style: item => outcomes[item.outcome],
+      style: item => loggers[item.outcome],
+      width: 10,
     },
     {
       name: sourceName,
       data: item => item.source,
-      style: item => outcomes[item.outcome],
+      width: dataWidth,
     },
     {
       name: destinationName,
       data: item => item.destination,
-      style: item => outcomes[item.outcome],
+      width: dataWidth,
     },
   ]);
 
@@ -146,7 +152,7 @@ export const compareConfigSets = (
 
     const valueToUse = Array.isArray(value) ? value.join(',') : value;
 
-    return valueToUse.length > 32 ? valueToUse.slice(0, 32) + '…' : valueToUse;
+    return valueToUse.length > dataWidth ? valueToUse.slice(0, dataWidth - 2) + '…' : valueToUse;
   };
 
   const data = allKeys.reduce((acc: CompareTableData[], key: string) => {

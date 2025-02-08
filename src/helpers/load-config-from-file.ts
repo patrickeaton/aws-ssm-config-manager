@@ -1,3 +1,4 @@
+// @ts-ignore - TS7016
 import { parse } from 'envfile';
 import { promises } from 'fs';
 import { ConfigSet } from '../models';

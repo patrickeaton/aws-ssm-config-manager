@@ -13,16 +13,23 @@ import {
   MISSING_AWS_ACTION,
   MISSING_LOCAL_ACTION,
 } from './constants';
+import { EasyCLI } from 'easy-cli-framework/app';
+import { EasyCLIConfigFile } from 'easy-cli-framework/config';
+import { EasyCLITheme } from 'easy-cli-framework/themes';
 import {
-  EasyCLI,
-  EasyCLIConfigFile,
-  EasyCLITheme,
   EasyCLICommand,
-  EasyCLIInitCommand,
   EasyCLIConfigureCommand,
-} from 'easy-cli-framework';
+} from 'easy-cli-framework/commands';
 
-const theme = new EasyCLITheme();
+const theme = new EasyCLITheme(
+  0, 
+  {
+    info: { color: '#CCCCCC' },
+    success: { color:  '#00CC00' },
+    error: { color: '#CC0000' },
+    warn: { color: '#CCCC00' },
+  }
+);
 const config = new EasyCLIConfigFile({
   filename: 'aws-ssm.config',
   extensions: ['json', 'js', 'ts'],

@@ -7,7 +7,7 @@ import {
   compareConfigSets,
 } from '../helpers/compare-config-sets';
 import { Parameters } from '../models';
-import { EasyCLITheme } from 'easy-cli-framework';
+import { EasyCLITheme } from 'easy-cli-framework/themes';
 
 // Without updating compare the records in the parameter store with the records in the config file
 export const compareConfigHandler = async (

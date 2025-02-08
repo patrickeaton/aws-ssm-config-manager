@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "outDir": "./dist",
-    "module": "CommonJS",
+    "module": "NodeNext",
     "target": "es2019",
-    "moduleResolution": "node",
+    "moduleResolution": "nodenext",
 
     "sourceMap": true,
     "declaration": true,

@@ -18,12 +18,6 @@ export const EMPTY_KEY_ACTION = {
   replace: 'replace', // Replace the key with a placeholder value
 };
 
-export const DEFAULT_CONFIG_PATHS = [
-  'aws-ssm.config.json',
-  'aws-ssm.config.js',
-  'aws-ssm.config.ts',
-];
-
 export const DEFAULT_EMPTY_KEY_STRING = '[EMPTY]';
 
 export const DEFAULT_PARAMETERS: Parameters = {
