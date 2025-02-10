@@ -2,6 +2,7 @@ import { SSM } from '@aws-sdk/client-ssm';
 import {
   COMPARE_OUTCOMES,
   compareConfigSets,
+  getAwsCredentials,
   loadConfigFromAws,
   loadConfigFromFile,
 } from '../helpers';
@@ -24,6 +25,7 @@ export const pushConfigHandler = async (
 ) => {
   const {
     env,
+    profile,
     region,
     prefix,
     verbose,
@@ -36,11 +38,12 @@ export const pushConfigHandler = async (
   const localConfig = await loadConfigFromFile(env);
   const awsConfig = await loadConfigFromAws(
     region,
+    profile,
     prefix,
     emptyKeyPlaceholder
   );
 
-  const ssm = new SSM({ region });
+  const ssm = new SSM({ region, credentials: getAwsCredentials(profile) });
 
   const compareResults = compareConfigSets(localConfig, awsConfig, theme, {
     verbose,

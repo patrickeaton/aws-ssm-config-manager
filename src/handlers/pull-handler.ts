@@ -1,10 +1,7 @@
 // @ts-ignore
 import { stringify } from 'envfile';
 import { promises } from 'fs';
-import {
-  loadConfigFromAws,
-  loadConfigFromFile,
-} from '../helpers';
+import { loadConfigFromAws, loadConfigFromFile } from '../helpers';
 import { ConfigSet, Parameters } from '../models';
 import {
   COMPARE_OUTCOMES,
@@ -19,6 +16,7 @@ export const pullConfigHandler = async (
 ) => {
   const {
     env,
+    profile,
     region,
     prefix,
     verbose,
@@ -30,6 +28,7 @@ export const pullConfigHandler = async (
   const existingConfig = await loadConfigFromFile(env);
   const awsConfig = await loadConfigFromAws(
     region,
+    profile,
     prefix,
     emptyKeyPlaceholder
   );

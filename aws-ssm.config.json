@@ -1,9 +1,20 @@
 {
-  "env": ".dev.env",
-  "prefix": "/dev/config/",
-  "region": "us-east-1",
-  "missingAwsAction": "keep",
-  "missingLocalAction": "keep",
-  "emptyKeyAction": "skip",
-  "emptyKeyPlaceholder": "[EMPTY]"
+  "patrickeaton": {
+    "env": ".dev.env",
+    "prefix": "/dev/config/",
+    "region": "us-east-1",
+    "missingAwsAction": "keep",
+    "missingLocalAction": "keep",
+    "emptyKeyAction": "skip",
+    "emptyKeyPlaceholder": "[EMPTY]"
+  },
+  "dev": {
+    "env": ".dev.env",
+    "prefix": "/dev/config/",
+    "region": "us-east-1",
+    "missingAwsAction": "keep",
+    "missingLocalAction": "keep",
+    "emptyKeyAction": "skip",
+    "emptyKeyPlaceholder": "[EMPTY]"
+  }
 }

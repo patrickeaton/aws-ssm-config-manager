@@ -1,7 +1,4 @@
-import {
-  loadConfigFromAws,
-  loadConfigFromFile,
-} from '../helpers';
+import { loadConfigFromAws, loadConfigFromFile } from '../helpers';
 import {
   COMPARE_OUTCOMES,
   compareConfigSets,
@@ -16,6 +13,7 @@ export const compareConfigHandler = async (
 ) => {
   const {
     env,
+    profile,
     region,
     prefix,
     verbose,
@@ -28,6 +26,7 @@ export const compareConfigHandler = async (
   const existingConfig = await loadConfigFromFile(env);
   const awsConfig = await loadConfigFromAws(
     region,
+    profile,
     prefix,
     emptyKeyPlaceholder
   );

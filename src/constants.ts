@@ -26,6 +26,7 @@ export const DEFAULT_PARAMETERS: Parameters = {
   keys: [],
   verbose: 0,
   region: 'us-east-1',
+  profile: 'default',
   missingLocalAction: MISSING_LOCAL_ACTION.keep,
   missingAwsAction: MISSING_AWS_ACTION.keep,
   emptyKeyAction: EMPTY_KEY_ACTION.skip,

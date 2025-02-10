@@ -16,6 +16,7 @@ export type EmptyKeyAction =
 export type Parameters = {
   config?: string;
   env: string;
+  profile: string;
   prefix: string;
   keys: string[];
   verbose: number;

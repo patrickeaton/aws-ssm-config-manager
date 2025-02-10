@@ -1,12 +1,15 @@
 import { SSM } from '@aws-sdk/client-ssm';
 import { ConfigSet } from '../models';
+import { getAwsCredentials } from './get-aws-credentials';
+
 
 export const loadConfigFromAws = async (
   region: string,
+  profile: string,
   prefix: string,
   emptyKeyPlaceholder: string
 ): Promise<ConfigSet> => {
-  const ssm = new SSM({ region });
+  const ssm = new SSM({ region, credentials: getAwsCredentials(profile) });
 
   let results: any[] = [];
   let token: string | undefined;

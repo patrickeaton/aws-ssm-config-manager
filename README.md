@@ -46,6 +46,8 @@ Manage your configuration file
 
 ### Using AWS Profiles
 
+The command takes the `--profile` option, which configures which named profile to use from your `.ini` file for aws-cli.
+
 If you're using profiles with the AWS CLI you can provide the profile to use via the `AWS_PROFILE` environment variable. [See More](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html)
 
 
@@ -55,6 +57,9 @@ If you're using profiles with the AWS CLI you can provide the profile to use via
 Display usage information about the tool or command.
 
 `--env, -e [string] [default .env]`
+The path to the env file to use. 
+
+`--profile, [string] [default default]`
 The path to the env file to use. 
 
 `--prefix, -pf [string] [default /]`
@@ -98,9 +103,12 @@ When using both a config file and command line instructions, the command-line va
 [Example config.json](https://github.com/patrickeaton/aws-ssm-config-manager/blob/master/aws-ssm.config.json)
 ```
 {
- "env": ".dev.env",
- "region": "us-east-1",
- "prefix": "/dev/config/"
+  // Your named profile OR default, so you can store different credentials for different environments
+  "default": {
+   "env": ".dev.env",
+   "region": "us-east-1",
+   "prefix": "/dev/config/"
+  }
 }
 ```
 
@@ -113,8 +121,10 @@ const env = process.env.NODE_ENV || 'local';
  * Depending on the NODE_ENV passed to the script it will load the appropriate configuation.
  */
 module.exports = {
-    region: 'us-east-1',
-    env: `.${env}.env`,
-    prefix: `/${env}/config/`
+    default: {
+      region: 'us-east-1',
+      env: `.${env}.env`,
+      prefix: `/${env}/config/`
+    }
 }
 ```

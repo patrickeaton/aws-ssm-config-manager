@@ -21,19 +21,19 @@ import {
   EasyCLIConfigureCommand,
 } from 'easy-cli-framework/commands';
 
-const theme = new EasyCLITheme(
-  0, 
-  {
-    info: { color: '#CCCCCC' },
-    success: { color:  '#00CC00' },
-    error: { color: '#CC0000' },
-    warn: { color: '#CCCC00' },
-  }
-);
+const theme = new EasyCLITheme(0, {
+  info: { color: '#CCCCCC' },
+  success: { color: '#00CC00' },
+  error: { color: '#CC0000' },
+  warn: { color: '#CCCC00' },
+});
+
 const config = new EasyCLIConfigFile({
   filename: 'aws-ssm.config',
   extensions: ['json', 'js', 'ts'],
   recursion: 'merge_lowest_first',
+  saveTransform: ({ profile, ...config }) => ({ [profile]: config }),
+  loadTransform: (config, argv: any) => config[argv.profile],
 });
 
 const push = new EasyCLICommand<{}, Parameters>('push', pushConfigHandler, {
@@ -64,6 +64,7 @@ const configure = new EasyCLIConfigureCommand<{}, Parameters>(
       'missingLocalAction',
       'emptyKeyAction',
       'emptyKeyPlaceholder',
+      'profile',
     ],
     promptGlobalKeys: [
       'env',
@@ -73,6 +74,7 @@ const configure = new EasyCLIConfigureCommand<{}, Parameters>(
       'missingLocalAction',
       'emptyKeyAction',
       'emptyKeyPlaceholder',
+      'profile',
     ],
     aliases: ['config'],
   }
@@ -134,6 +136,11 @@ new EasyCLI<Parameters>({
       default: DEFAULT_EMPTY_KEY_STRING,
       description:
         'AWS SSM does not support empty strings. When the emptyKeyAction is replace, this will be the value used to replace the empty string.',
+    },
+    profile: {
+      type: 'string',
+      description: 'The AWS profile to use',
+      default: 'default',
     },
   },
 })
